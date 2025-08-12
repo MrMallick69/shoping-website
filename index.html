@@ -17,13 +17,17 @@
     }
     /* Reset / layout */
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('https://cdn.wallpapersafari.com/57/55/6SFeDW.jpg') center/cover fixed;
-      color:#e6eef6;
-      padding:20px;
-    }
+    body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)),
+              url('https://images.unsplash.com/photo-1523275335684-37898b6baf30') 
+              no-repeat center center fixed;
+  background-size: cover;
+  color: #e0e0e0;
+}
+
     header{max-width:1200px;margin:0 auto 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;align-items:center;gap:12px}
     .logo{width:52px;height:52px;border-radius:8px;object-fit:cover}
@@ -296,3 +300,4 @@ I can scaffold a Node/Express backend + Razorpay integration if you want — say
 </script>
 </body>
 </html>
+
