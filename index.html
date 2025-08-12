@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>💎 ELITE DEALER 🛒</title>
+  <meta name="description" content="Elite Dealer — shopping site demo (catalog, cart, checkout, simulated payments)" />
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0e1419;
+      --muted:#9aa4b2;
+      --accent: #3ddc84;   /* lime green */
+      --gold:#ffcc00;
+      --card-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      --radius:12px;
+    }
+    /* Reset / layout */
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('https://cdn.wallpapersafari.com/57/55/6SFeDW.jpg') center/cover fixed;
+      color:#e6eef6;
+      padding:20px;
+    }
+    header{max-width:1200px;margin:0 auto 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:52px;height:52px;border-radius:8px;object-fit:cover}
+    h1{margin:0;font-size:1.5rem;color:var(--accent);text-shadow:0 2px 6px rgba(0,0,0,.6)}
+    .tagline{color:var(--muted);font-size:.9rem}
+    /* controls */
+    .controls{max-width:1200px;margin:12px auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .search{flex:1;min-width:180px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:inherit}
+    select{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:inherit}
+    .btn{padding:9px 12px;border-radius:10px;border:none;background:var(--accent);color:#06110a;cursor:pointer;font-weight:700}
+    .btn.secondary{background:#ff7b00;color:#fff}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    /* main layout */
+    .main{max-width:1200px;margin:18px auto;display:grid;grid-template-columns:1fr 360px;gap:20px}
+    @media(max-width:900px){.main{grid-template-columns:1fr;padding:0 10px}}
+    /* catalog */
+    .catalog{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:var(--panel);padding:14px;border-radius:var(--radius);box-shadow:var(--card-shadow);color:inherit;transition:transform .18s,box-shadow .18s}
+    .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.75)}
+    .product-img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px}
+    .product h3{margin:6px 0;font-size:1.02rem}
+    .meta{display:flex;justify-content:space-between;align-items:center}
+    .price{color:var(--gold);font-weight:800}
+    .star{color:gold}
+    /* cart */
+    aside.cart{position:sticky;top:24px}
+    .cart .items{max-height:420px;overflow:auto;margin-bottom:12px}
+    .cart-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:10px;background:rgba(255,255,255,0.02);margin-bottom:8px}
+    .small{font-size:.9rem;color:var(--muted)}
+    .checkout input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);margin-bottom:8px;background:transparent;color:inherit}
+    .payment-methods img{height:36px;cursor:pointer;margin-right:8px;border-radius:6px}
+    footer{max-width:1200px;margin:28px auto;color:var(--muted);text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Logo_ED.svg/120px-Logo_ED.svg.png" alt="ED logo">
+      <div>
+        <h1>💎 ELITE DEALER 🛍️</h1>
+        <div class="tagline small">Premium & Cheap IDs • Diamonds • Fast Delivery</div>
+      </div>
+    </div>
+
+    <!-- WhatsApp contact (click-to-open chat) -->
+    <div class="whatsapp small" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="wh" style="height:22px">
+      <a href="https://wa.me/918850821115" style="color:inherit;text-decoration:none">+91 88508 21115</a>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input id="search" class="search" placeholder="🔍 Search products or IDs..." oninput="renderProducts()" />
+    <select id="category" onchange="renderProducts()">
+      <option value="">📂 All Categories</option>
+      <option value="PREMIUM ID'S">💎 PREMIUM ID'S</option>
+      <option value="CHEAP ID'S">💰 CHEAP ID'S</option>
+      <option value="Diamonds">💠 Diamonds</option>
+    </select>
+    <button class="btn ghost" onclick="clearCart()">🧹 Clear Cart</button>
+  </div>
+
+  <div class="main">
+    <div>
+      <div id="product-list" class="catalog"></div>
+    </div>
+
+    <aside class="cart card">
+      <h3>🛒 Cart</h3>
+      <div class="items" id="cart-items"></div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="small">Total</div>
+        <div class="price">₹<span id="total">0</span></div>
+      </div>
+
+      <div class="checkout">
+        <input id="name" placeholder="👤 Your name" />
+        <input id="email" placeholder="📧 Email" />
+        <div style="margin:8px 0" class="small">💳 Payment method</div>
+        <div style="display:flex;align-items:center;margin-bottom:10px">
+          <img src="https://1000logos.net/wp-content/uploads/2021/06/PhonePe-logo.png" alt="PhonePe" onclick="selectPayment('PhonePe')" title="PhonePe">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" onclick="selectPayment('Google Pay')" title="Google Pay">
+        </div>
+
+        <div id="selected-payment" class="small" style="margin-bottom:8px;color:var(--muted)"></div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="startCheckout()">🛍️ Place Order</button>
+          <button class="btn secondary" onclick="quickCheckout()">⚡ Quick Buy</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>© 2025 ELITE DEALER • <a href="https://wa.me/918850821115" style="color:inherit">WhatsApp</a></footer>
+
+<script>
+/*
+  Complete front-end shopping demo.
+  - To enable real payments (Razorpay / PhonePe merchant API etc.) you'll need a backend to create/verify orders.
+  - This file is ready to deploy as static site (GitHub Pages / Netlify).
+*/
+
+/* ---------- DATA ---------- */
+const products = [
+  { id:1, name:"✨ GOLDEN EP ID'S", price:199, category:"PREMIUM ID'S", image:'https://images.unsplash.com/photo-1585386959984-a41552262c1f?auto=format&fit=crop&w=600&q=80', rating:5 },
+  { id:2, name:"👖 Golden Jeans", price:299, category:"PREMIUM ID'S", image:'https://images.unsplash.com/photo-1583743780649-5a1be748a87b?auto=format&fit=crop&w=600&q=80', rating:4 },
+  { id:3, name:"🔒 NORMAL VAULT ID'S", price:149, category:"CHEAP ID'S", image:'https://images.unsplash.com/photo-1603808033192-082d6919d87c?auto=format&fit=crop&w=600&q=80', rating:3 },
+  { id:4, name:"💎 Cheap Diamond Pack", price:99, category:"Diamonds", image:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Diamond_icon.svg/1024px-Diamond_icon.svg.png', rating:4 }
+];
+
+/* ---------- DOM refs & state ---------- */
+const productList = document.getElementById('product-list');
+const cartItemsEl = document.getElementById('cart-items');
+const totalEl = document.getElementById('total');
+const searchEl = document.getElementById('search');
+const categoryEl = document.getElementById('category');
+
+let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+let selectedPayment = null;
+
+/* ---------- helpers ---------- */
+function formatStars(n){ return '⭐'.repeat(n)+'☆'.repeat(5-n); }
+function saveCart(){ localStorage.setItem('cart', JSON.stringify(cart)); }
+
+/* ---------- render ---------- */
+function renderProducts(){
+  const kw = searchEl.value.toLowerCase().trim();
+  const cat = categoryEl.value;
+  productList.innerHTML = '';
+
+  const filtered = products.filter(p => p.name.toLowerCase().includes(kw) && (cat === '' || p.category === cat));
+  if(filtered.length === 0){
+    productList.innerHTML = `<div class="card">🚫 No products found.</div>`;
+    return;
+  }
+
+  filtered.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <img class="product-img" src="${p.image}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <div class="star">${formatStars(p.rating)}</div>
+      <div class="meta"><div class="small">${p.category}</div><div class="price">₹${p.price}</div></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn" onclick="addToCart(${p.id})">➕ Add</button>
+        <button class="btn secondary" onclick="buyNow(${p.id})">Buy Now</button>
+      </div>
+    `;
+    productList.appendChild(el);
+  });
+}
+
+function updateCart(){
+  cartItemsEl.innerHTML = ''; let total = 0;
+  cart.forEach((it, idx) => {
+    const d = document.createElement('div');
+    d.className = 'cart-item';
+    d.innerHTML = `<div><strong>${it.name}</strong><div class="small">×1</div></div>
+                   <div>₹${it.price} <button class="btn" style="background:#e11d48;color:#fff;margin-left:8px" onclick="removeFromCart(${idx})">Remove</button></div>`;
+    cartItemsEl.appendChild(d);
+    total += it.price;
+  });
+  totalEl.textContent = total;
+  saveCart();
+}
+
+/* ---------- cart actions ---------- */
+function addToCart(id){
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  cart.push(p);
+  updateCart();
+  alert('Added to cart ✅');
+}
+function removeFromCart(index){
+  cart.splice(index,1);
+  updateCart();
+}
+function clearCart(){
+  if(!confirm('Clear cart?')) return;
+  cart = []; updateCart();
+}
+
+/* ---------- quick buy (pre-fill cart with single item and go checkout) ---------- */
+function buyNow(id){
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  cart = [p]; updateCart();
+  // scroll to checkout (mobile friendly)
+  document.querySelector('aside.cart').scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- payment selection (simulated) ---------- */
+function selectPayment(method){
+  selectedPayment = method;
+  document.getElementById('selected-payment').textContent = 'Selected: ' + method;
+}
+
+/* ---------- checkout flow (opens a new tab with confirmation) ---------- */
+function startCheckout(){
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  if(!name || !email){ alert('Please fill name and email.'); return; }
+  if(cart.length === 0){ alert('Your cart is empty.'); return; }
+  if(!selectedPayment){ alert('Please select a payment method.'); return; }
+
+  const total = cart.reduce((s,i)=>s + i.price, 0);
+  const params = new URLSearchParams({name, email, total, method: selectedPayment}).toString();
+
+  // 1) Open a confirmation tab (order-confirmation.html?...) — replace with real payment gateway URL if needed
+  const win = window.open('order-confirmation.html?' + params, '_blank');
+
+  // 2) If the new page is empty (no order-confirmation.html deployed), write a simple confirmation fallback
+  try{
+    win.document.title = 'Order Confirmed';
+    win.document.body.style.margin = '0';
+    win.document.body.style.fontFamily = 'Segoe UI, Arial, sans-serif';
+    win.document.body.style.background = '#07101a';
+    win.document.body.style.color = '#e6eef6';
+    win.document.body.style.display = 'flex';
+    win.document.body.style.flexDirection = 'column';
+    win.document.body.style.justifyContent = 'center';
+    win.document.body.style.alignItems = 'center';
+    win.document.body.style.height = '100vh';
+    const h = win.document.createElement('h1');
+    h.style.color = 'limegreen';
+    h.style.fontSize = '2rem';
+    h.textContent = '✅ Order Confirmed Successfully!';
+    const p = win.document.createElement('p');
+    p.style.fontSize = '1.1rem';
+    p.style.marginTop = '8px';
+    p.textContent = `Thanks ${name}. Total: ₹${total}. Payment: ${selectedPayment}`;
+    win.document.body.appendChild(h);
+    win.document.body.appendChild(p);
+  }catch(e){
+    console.warn('Could not write to new window (popup blocked or cross-origin).', e);
+  }
+
+  // Clear cart and form locally
+  cart = []; updateCart();
+  document.getElementById('name').value = '';
+  document.getElementById('email').value = '';
+  selectedPayment = null;
+  document.getElementById('selected-payment').textContent = '';
+  alert('Order placed — confirmation opened in a new tab.');
+}
+
+/* For "Quick Buy" button in the cart area */
+function quickCheckout(){
+  if(cart.length === 0){ alert('Add item(s) to cart first'); return; }
+  // For demo: open checkout validations
+  startCheckout();
+}
+
+/* ---------- init ---------- */
+renderProducts();
+updateCart();
+
+/* ---------- NOTES for real payments ----------
+To accept real payments (Razorpay / PhonePe / Google Pay UPI flows) you must:
+1) Create a backend endpoint to create an order (server signs request securely with API key/secret).
+2) Use the provider's SDK or deep-link flow from the frontend (Razorpay checkout.js or UPI intent).
+3) Verify payment on the backend (webhook or verify signature).
+I can scaffold a Node/Express backend + Razorpay integration if you want — say which provider.
+---------------------------------------------- */
+
+</script>
+</body>
+</html>
